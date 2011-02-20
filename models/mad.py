@@ -1,0 +1,209 @@
+# -*- coding: utf-8 -*-
+
+"""
+    MAD (Mobile Assessment of Damage)
+
+    @author: Mark Lee
+
+"""
+
+module = "mad"
+if deployment_settings.has_module(module):
+
+    def create_enum(name, label, option_list):
+        return db.Table(None, "%s_type" % name,
+                        Field(name,
+                              requires=IS_IN_SET(option_list, zero=None),
+                              label=label))
+    #def create_enum(name, label, option_list):
+    #    options = dict([(i + 1, opt) for i, opt in enumerate(option_list)])
+    #    return db.Table(None, "%s_type" % name,
+    #                    Field(name, "integer",
+    #                          requires=IS_IN_SET(options, zero=None),
+    #                          label=label, represent=lambda opt: options.get(opt, UNKNOWN_OPT)))
+    opt_type_cause = create_enum("cause", T("Primary Cause of Damage"), [
+        T("flood"),
+        T("fire"),
+        T("wind"),
+        T("earthquake"),
+        T("volcano"),
+        T("snow-ice"),
+        T("vandalism"),
+    ])
+    opt_type_damage = create_enum("damage", T("Category of Damage"), [
+        T("structural"),
+        T("roadway"),
+        T("land"),
+    ])
+    opt_type_damage_degree = create_enum("damage_degree", T("Degree of damage"), [
+        T("minor"),
+        T("medium"),
+        T("major"),
+    ])
+    opt_type_preferred = create_enum("preferred", T('Preferred method of contact'), [
+        T('landline-phone'),
+        T('cell-phone'),
+        T('e-mail'),
+        T('postal-mail'),
+    ])
+
+    #--------------------------------------------------------------------------
+    # Residence damage assessment
+
+    resourcename = "residence"
+    tablename = module + "_" + resourcename
+
+    table = db.define_table(tablename,
+                            # responder contact
+                            Field("first_name"),
+                            Field("middle_name"),
+                            Field("last_name"),
+                            Field("street1", label=T("Street address 1")),
+                            Field("street2", label=T("Street address 2")),
+                            Field("city"),
+                            Field("county"),
+                            Field("postcode", label=T("Zip")),
+                            Field("latitude", "double"),
+                            Field("longitude", "double"),
+                            # residence info
+                            Field("is_owner", "boolean", default=True, label=T('Are you an owner?')),
+                            Field("estpredistfmv", "integer", label=T('Estimated Pre-Disaster FMV of STRUCTURE')),
+                            Field("damage_date", "date", label=T('Date of Damage')),
+                            # damages
+                            Field("eststructloss", "integer", label=T('Estimated STRUCTURE Loss in $$')),
+                            Field("estperproploss", "integer",
+                                  label=T("Estimated PERSONAL PROPERTY Loss in $$")),
+                            opt_type_cause,
+                            Field("is_habitable", "boolean", default=True),
+                            Field("is_accessible", "boolean", default=True),
+                            opt_type_damage,
+                            Field("description", "text", label=T("Description of Damages")),
+                            Field("location", "text", label=T('Damage Location Description')),
+                            Field("uninsured_loss", "integer", label=T('Total Uninsured Loss')),
+                            # insurance
+                            Field("insurance", "boolean", default=True, label=T('Do you have insurance?')),
+                            Field("insurance_type", label=T('Type of Insurance')),
+                            Field("provider", label=T("Insurance provider")),
+                            Field("deductible", "integer"),
+                            # contact
+                            Field("fema", "boolean", label=T('Have you started a FEMA application?')),
+                            Field("reference", "integer", label=T('What is your FEMA reference number?')),
+                            Field("contact", label=T("Contact Name")),
+                            opt_type_preferred,
+                            Field("phone", label=T("Contact Phone"), requires=shn_phone_requires),
+                            Field("phone_extension"),
+                            Field("cell", label=T('Contact cell'), requires=shn_phone_requires),
+                            Field("contact_email", label=T("Contact Email")),
+                            Field("contact_email2", label=T("Second Contact Email")),
+                            migrate=migrate, *s3_meta_fields())
+
+    ADD_RESIDENCE = T("Add Residence")
+    LIST_RESIDENCES = T("List Residences")
+    s3.crud_strings[tablename] = Storage(
+        title_create = ADD_RESIDENCE,
+        title_display = T("Residence Details"),
+        title_list = LIST_RESIDENCES,
+        title_update = T("Edit Residence"),
+        title_search = T("Search Residences"),
+        subtitle_create = T("Add New Residence"),
+        subtitle_list = T("Residences"),
+        label_list_button = LIST_RESIDENCES,
+        label_create_button = ADD_RESIDENCE,
+        msg_record_created = T("Residence added"),
+        msg_record_modified = T("Residence updated"),
+        msg_record_deleted = T("Residence deleted"),
+        msg_list_empty = T("No Residences currently registered"))
+
+    residence_id = S3ReusableField("residence_id", db.mad_residence,
+                                   label=T("Residence ID"),
+                                   requires=IS_ONE_OF(db, "mad_residence.id"))
+
+    resourcename = "residence_image"
+    tablename = module + "_" + resourcename
+
+    residence_image = db.define_table(tablename,
+                                      residence_id(),
+                                      image_id())
+
+    s3xrc.model.add_component(module, resourcename, multiple=True,
+                              joinby=dict(mad_residence="residence_id"))
+
+    #--------------------------------------------------------------------------
+    # Business property damage assessment
+
+    resourcename = "business"
+    tablename = module + "_" + resourcename
+
+    table = db.define_table(tablename,
+                            # business info
+                            Field("business_name"),
+                            Field("owner_name"),
+                            Field("street1", label=T("Street address 1")),
+                            Field("street2", label=T("Street address 2")),
+                            Field("city"),
+                            Field("county"),
+                            Field("postal", label=T("ZIP code")),
+                            Field("occupant", label=T("Business occupant")),
+                            Field("pre_disaster", "integer", label=T('Estimated Pre-Disaster')),
+                            Field("fmv", "integer", label=T('FMV of business')),
+                            Field("employees", "integer"),
+                            # damages
+                            Field("damage_date", "date", label=T('Date of Damage')),
+                            Field("eststructloss", "integer", label=T('Estimated STRUCTURE Loss in $$')),
+                            Field("estfurnishinvloss", "integer",
+                                  label=T("Estimated $ Loss Furnishing / Inventory")),
+                            opt_type_cause,
+                            opt_type_damage,
+                            Field("location", "text", label=T('Damage Location Description')),
+                            Field("closed", "integer", label=T('number of days closed due to disaster')),
+                            Field("description", "text", label=T("Description of Damages")),
+                            opt_type_damage_degree,
+                            # response
+                            Field("fema", "boolean", label=T('Have you started a FEMA application?')),
+                            Field("reference", "integer", label=T('What is your FEMA reference number?')),
+                            # insurance
+                            Field("insurance", "boolean", default=True, label=T('Do you have insurance?')),
+                            Field("insurance_type", label=T('Type of Insurance')),
+                            Field("provider", label=T("Insurance provider")),
+                            Field("deductible", "integer"),
+                            Field("business_insurance", "boolean", default=True, label=T("Business Continuity Insurance?")),
+                            # contact
+                            opt_type_preferred,
+                            Field("contact", label=T("Contact Name")),
+                            Field("phone", label=T("Contact Phone"), requires=shn_phone_requires),
+                            Field("phone_extension"),
+                            Field("cell", label=T('Contact cell'), requires=shn_phone_requires),
+                            Field("contact_email", label=T("Contact Email")),
+                            Field("contact_email2", label=T("Second Contact Email")),
+                            migrate=migrate, *s3_meta_fields())
+
+    ADD_BUSINESS = T("Add Business")
+    LIST_BUSINESSES = T("List Businesses")
+    s3.crud_strings[tablename] = Storage(
+        title_create = ADD_BUSINESS,
+        title_display = T("Business Details"),
+        title_list = LIST_BUSINESSES,
+        title_update = T("Edit Business"),
+        title_search = T("Search Businesses"),
+        subtitle_create = T("Add New Business"),
+        subtitle_list = T("Businesses"),
+        label_list_button = LIST_BUSINESSES,
+        label_create_button = ADD_BUSINESS,
+        msg_record_created = T("Business added"),
+        msg_record_modified = T("Business updated"),
+        msg_record_deleted = T("Business deleted"),
+        msg_list_empty = T("No Businesses currently registered"))
+
+    business_id = S3ReusableField("business_id", db.mad_business,
+                                  label=T("Business ID"),
+                                  requires=IS_ONE_OF(db, "mad_business.id"))
+
+    resourcename = "business_image"
+    tablename = module + "_" + resourcename
+
+    business_image = db.define_table(tablename,
+                                     business_id(),
+                                     image_id())
+
+    s3xrc.model.add_component(module, resourcename, multiple=True,
+                              joinby=dict(mad_residence="business_id"))

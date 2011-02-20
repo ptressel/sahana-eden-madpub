@@ -1,0 +1,6 @@
+{{extend "layout.html"}}
+{{include "_list.html"}}
+{{if auth.is_logged_in():}}
+<a id='add-btn' class='action-btn' href='{{=URL(r=request, c="assess", f="basic_assess")}}'>Add Assessment</a>
+{{else:}}
+{{pass}}

@@ -1,0 +1,12 @@
+{{extend "layout.html"}}
+{{include "_display.html"}}
+{{try:}}
+{{last_update = shn_last_update(db.hms_hospital, record_id)}}
+<script type="text/javascript">//<![CDATA[
+$(document).ready(function(){
+    var last_update = "<h4 id='last_update'>{{=last_update}}</h4>";
+    $('#rheader').before(last_update);
+});
+//]]></script>
+{{except:}}
+{{pass}}

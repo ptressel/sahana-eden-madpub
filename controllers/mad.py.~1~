@@ -1,0 +1,153 @@
+# -*- coding: utf-8 -*-
+
+"""
+    Mobile Assessment of Damage
+
+    @author: Pat Tressel
+"""
+
+# Administrators can view existing assessments and create assessments.
+# Non-admins can only add assessments and update the newly created assessment.
+# They cannot currently alter an assessment once created.
+
+module = request.controller
+
+if module not in deployment_settings.modules:
+    session.error = T("Module disabled!")
+    redirect(URL(r=request, c="default", f="index"))
+
+# Options Menu (available in all Functions' Views)
+def shn_menu():
+    """ Options Menu """
+    if shn_has_role(1):
+        menu = [
+            [T("Residence Assessments"), False, URL(r=request, f="residence"), [
+                [T("List"), False, URL(r=request, f="residence")],
+                [T("Add"), False, URL(r=request, f="residence", args="create")],
+                # @ToDo Search by person, county
+                #[T("Search"), False, URL(r=request, f="residence", args="search")],
+            ]],
+            [T("Business Property Assessments"), False, URL(r=request, f="business"), [
+                [T("List"), False, URL(r=request, f="business")],
+                [T("Add"), False, URL(r=request, f="business", args="create")],
+                # @ToDo Search by person, county
+                #[T("Search"), False, URL(r=request, f="business", args="search")],
+            ]],
+        ]
+    else:
+        menu = [
+            [T("Add assessment for a residence"), False, URL(r=request, f="residence", args="create")],
+            [T("Add assessment for a business property"), False, URL(r=request, f="business", args="create")],
+        ]
+    response.menu_options = menu
+
+shn_menu()
+
+# S3 framework functions
+
+# -----------------------------------------------------------------------------
+def index():
+    """ Module's Home Page """
+
+    module_name = deployment_settings.modules[module].name_nice
+
+    return dict(module_name=module_name)
+
+# -----------------------------------------------------------------------------
+def generic(response, module, resourcename):
+    """ Common code in controllers """
+
+    from pprint import pformat
+    print >> sys.stderr, pformat(request.post_vars)
+    print >> sys.stderr, pformat(request.args)
+
+    # Pre-processor
+    #def prep(r):
+    #    """ Redirect to create if not admin """
+    #    if r.representation == "html":
+    #        if not shn_has_role(1):
+    #            r.method = "create"
+    #            r.id = None
+    #    return True
+    #response.s3.prep = prep
+
+    #tablename = "%s_%s" % (module, resourcename)
+    #def onaccept(form):
+    #    print >> sys.stderr, "In mad onaccept for %s" % tablename
+    #    r.next = r.other(method="update", record_id=form.vars.id)
+    #s3xrc.model.configure(db[tablename], onaccept=onaccept)
+
+    resource_image = "%s_image" % resourcename
+    print >> sys.stderr, "In mad generic, resource_image = %s" % resource_image
+    resource_tabs = [(T("Basic Details"), None),
+                     (T("Images"), resource_image)]
+    rheader = lambda r: shn_mad_rheader(r, tabs=resource_tabs)
+
+    print >> sys.stderr, "pre rest controller"
+    output = s3_rest_controller(module, resourcename,
+                                rheader=rheader)
+    print >> sys.stderr, "post rest controller"
+    print >> sys.stderr, "---- output ----"
+    print >> sys.stderr, output
+
+    return output
+
+# -----------------------------------------------------------------------------
+def shn_residence_rheader(r, tabs=[]):
+    """ Resource headers """
+
+    if r.representation == "html":
+        rheader_tabs = shn_rheader_tabs(r, tabs)
+        record = r.record
+        rheader = DIV(TABLE(
+                            TR(
+                                TH("%s: %s %s %s" % (T("Name"),
+                                                     record.first_name,
+                                                     record.middle_name,
+                                                     record.last_name)),
+                                TH("%s: %s %s" % (T("Address"),
+                                                  record.street1,
+                                                  record.street2)),
+                              ),
+                            ),
+                      rheader_tabs)
+        return rheader
+
+    return None
+
+# -----------------------------------------------------------------------------
+def residence():
+    """ RESTful CRUD controller """
+
+    resourcename = request.function
+
+    return generic(response, module, resourcename)
+
+# -----------------------------------------------------------------------------
+def shn_business_rheader(r, tabs=[]):
+    """ Resource headers """
+
+    if r.representation == "html":
+        rheader_tabs = shn_rheader_tabs(r, tabs)
+        record = r.record
+        rheader = DIV(TABLE(
+                            TR(
+                                TH("%s: %s" % (T("Name"),
+                                               record.business_name)),
+                                TH("%s: %s %s" % (T("Address"),
+                                                  record.street1,
+                                                  record.street2)),
+                              ),
+                            ),
+                      rheader_tabs)
+        return rheader
+
+    return None
+
+# -----------------------------------------------------------------------------
+def business():
+    """ RESTful CRUD controller """
+
+    resourcename = request.function
+
+    return generic(response, module, resourcename)

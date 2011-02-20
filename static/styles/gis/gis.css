@@ -1,0 +1,153 @@
+/* GIS module */
+.olControlMousePosition { font-size: 10px; background-color: white; }
+
+.crosshair {
+    cursor: crosshair;
+}
+
+/* Toolbar */
+#mappanel .zoomfull {
+    background-image: url(../../img/gis/mapfish/icon_zoomfull.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .zoomin {
+    background-image: url(../../img/gis/mapfish/icon_zoomin.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .zoomout {
+    background-image: url(../../img/gis/mapfish/icon_zoomout.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .pan-off {
+    background-image: url(../../img/gis/mapfish/icon_pan.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .measure-off {
+  background-image: url(../../img/gis/measuring-stick-off.png) !important;
+  height: 20px !important;
+  width: 20px !important;
+}
+#mappanel .measure-area {
+  background-image: url(../../img/gis/measure-area-off.png) !important;
+  height: 20px !important;
+  width: 20px !important;
+}
+#mappanel .modifyfeature {
+    background-image: url(../../img/gis/mapfish/move_vertex_off.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .drawpoint-off {
+  background-image: url(../../img/gis/add_point_off.png) !important;
+  height: 20px !important;
+  width: 20px !important;
+}
+#mappanel .drawline-off {
+  background-image: url(../../img/gis/mapfish/draw_line_off.png) !important;
+  height: 20px !important;
+  width: 20px !important;
+}
+#mappanel .drawpolygon-off {
+  background-image: url(../../img/gis/mapfish/draw_polygon_off.png) !important;
+  height: 20px !important;
+  width: 20px !important;
+}
+#mappanel .info {
+  background-image: url(../../img/gis/mapfish/info.png) !important;
+  height: 20px !important;
+  width: 20px !important;
+}
+#mappanel .searchclick {
+    background-image: url(../../img/ext/information.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .searchbox {
+    background-image: url(../../img/ext/information-box.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .back {
+    background-image: url(../../img/gis/mapfish/resultset_previous.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .next {
+    background-image: url(../../img/gis/mapfish/resultset_next.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .save {
+    background-image: url(../../img/ext/save.gif) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+.x-btn-text.geolocation {
+  background-image: url(../../img/gis/geolocation.png) !important;
+  height: 20px !important;
+  width: 20px !important;
+}
+.x-btn-text.potlatch {
+  background-image: url(../../img/gis/openstreetmap.png) !important;
+  height: 20px !important;
+  width: 20px !important;
+}
+#mappanel .movefeature {
+    background-image: url(../../img/gis/arrow_refresh.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .removefeature {
+    background-image: url(../../img/gis/remove_point_off.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .resizefeature {
+    background-image: url(../../img/gis/resize.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .rotatefeature {
+    background-image: url(../../img/gis/arrow_rotate_clockwise.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+
+/*
+#mappanel .mf-print-action {
+    background-image: url(../../img/gis/mapfish/printer.png) !important;
+}
+#mappanel .pan-on{
+    background-image: url(../../img/gis/openlayers/theme_default/pan_on.png) !important;
+    height: 20px !important;
+    width: 20px !important;
+}
+#mappanel .drawpoint-on {
+  background-image: url(../../img/gis/openlayers/theme_default/add_point_on.png) !important;
+  height: 20px !important;
+  width: 20px !important;
+}
+#mappanel .drawline-on {
+  background-image: url(../../img/gis/openlayers/theme_default/draw_line_on.png) !important;
+  height: 20px !important;
+  width: 20px !important;
+}
+#mappanel .drawpolygon-on{
+  background-image: url(../../img/gis/openlayers/theme_default/draw_polygon_on.png) !important;
+  height: 20px !important;
+  width: 20px !important;
+}
+#mappanel .measure-on {
+  background-image: url(../../img/gis/measuring-stick-on.png) !important;
+  height: 20px !important;
+  width: 20px !important;
+}
+*/
+ 
+/* Popups */
+#georsspopup h2 { margin: 0; }
+#kmlpopup h2 { margin: 0; }

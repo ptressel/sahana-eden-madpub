@@ -1,0 +1,40 @@
+{{try:}}
+ {{=H2(title)}}
+{{except:}}
+{{pass}}
+<div id='rheader'>
+{{try:}}
+ {{=rheader}}
+{{except:}}
+ {{pass}}
+</div>
+{{try:}}
+ {{=H3(subtitle)}}
+{{except:}}
+{{pass}}
+{{try:}}
+ {{include}}
+{{except:}}
+{{pass}}
+{{try:}}
+ <p>
+ {{=edit_btn}}
+ </p>
+{{except:}}
+{{pass}}
+<div id='map'></div>
+<div class='item-container'>
+{{try:}}
+ {{=item}}
+{{except:}}
+{{pass}}
+</div>
+{{try:}}
+ {{=delete_btn}}
+{{except:}}
+{{pass}}
+<p>&nbsp;</p>
+{{try:}}
+ {{=list_btn}}
+{{except:}}
+{{pass}}
